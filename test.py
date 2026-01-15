@@ -36,58 +36,6 @@ def command_injection_vulnerable(user_input):
     
     return True
 
-# 2. 不安全的反序列化（动态漏洞）
-import pickle
-import base64
-
-class MaliciousClass:
-    """恶意类，用于演示反序列化漏洞"""
-    def __reduce__(self):
-        # 在反序列化时执行系统命令
-        return (os.system, ('echo "反序列化漏洞触发!"',))
-
-def insecure_deserialization(serialized_data):
-    """
-    不安全的反序列化漏洞 - 高危
-    直接反序列化不可信的数据
-    """
-    print("\n[漏洞2] 不安全的反序列化测试")
-    
-    try:
-        # 危险：直接反序列化
-        obj = pickle.loads(serialized_data)
-        print("反序列化成功（可能存在安全隐患）")
-        return obj
-    except Exception as e:
-        print(f"反序列化失败: {e}")
-        return None
-
-# 3. 路径遍历漏洞（动态漏洞）
-def path_traversal_vulnerable(filename):
-    """
-    路径遍历漏洞 - 中危
-    允许访问任意文件路径
-    """
-    print("\n[漏洞3] 路径遍历测试")
-    
-    # 危险：未验证文件名
-    base_dir = "C:/data"
-    full_path = os.path.join(base_dir, filename)
-    
-    print(f"尝试访问: {full_path}")
-    
-    try:
-        if os.path.exists(full_path):
-            with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read(500)
-                print(f"文件内容预览: {content[:100]}...")
-                return content
-        else:
-            print("文件不存在")
-            return None
-    except Exception as e:
-        print(f"文件访问失败: {e}")
-        return None
 
 # ==================== 静态漏洞示例 ====================
 
@@ -278,12 +226,6 @@ def main():
         # 命令注入测试（使用安全参数）
         command_injection_vulnerable("127.0.0.1 -n 2")
         
-        # 反序列化测试（使用安全数据）
-        safe_data = pickle.dumps({"test": "data"})
-        insecure_deserialization(safe_data)
-        
-        # 路径遍历测试（使用安全路径）
-        path_traversal_vulnerable("test.txt")
     
     # 静态漏洞展示（始终显示）
     print("\n[静态漏洞展示]")
@@ -318,8 +260,6 @@ def main():
     vulnerabilities = {
         "动态漏洞": [
             "1. 命令注入漏洞",
-            "2. 不安全的反序列化",
-            "3. 路径遍历漏洞"
         ],
         "静态漏洞": [
             "1. 硬编码敏感信息",
